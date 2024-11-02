@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<!-- 전역일 계산기 웹 애플리케이션 HTML 파일 -->
+<html lang="en">
+<head>
+    <!-- 메타데이터와 스타일 정의 -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>전역일 계산기</title>
+    <!-- 계산기 타이틀 설정 -->
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* 인라인 CSS 스타일 정의 */
+        body {
+            /* 페이지 전반적인 레이아웃 설정 */
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+        }
+
+        .calculators-container {
+            /* 두 개의 계산기를 가운데 정렬하여 나란히 배치 */
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            justify-content: center;
+            gap: 20px;
+            width: 90%;
+            max-width: 1200px;
+            padding: 20px;
+        }
+
+        .calculator-container {
+            /* 계산기와 히스토리 컨테이너 설정 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #C4D1C5;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 50%;
+            max-width: 600px;
+        }
+
+        .input-container {
+            /* 날짜 입력 필드 스타일 */
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+
+            .input-container label {
+                font-size: 1.2em;
+                margin-bottom: 5px;
+            }
+
+            .input-container input, .input-container select {
+                padding: 10px;
+                font-size: 1.2em;
+                border-radius: 5px;
+                border: 1px solid #ccc;
+                margin-bottom: 10px;
+            }
+
+        .btn {
+            /* 계산 버튼 기본 스타일 */
+            padding: 15px;
+            font-size: 1.2em;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #C99DCA;
+            color: #ffffff;
+            transition: background-color 0.2s;
+            width: 100%;
+        }
+
+            .btn:hover {
+                /* 버튼 마우스 오버 시 스타일 */
+                background-color: #807097;
+            }
+
+            .btn:active {
+                /* 버튼 클릭 시 스타일 */
+                background-color: #ccc;
+            }
+
+        .result-container {
+            /* 결과 표시 영역 스타일 */
+            margin-top: 20px;
+            font-size: 1.2em;
+            text-align: center;
+            width: 100%;
+        }
+
+        .rank-progress-container {
+            position: relative;
+            width: 100%;
+            height: 40px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .progress-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background-color: #4CAF50;
+            border-radius: 10px;
+            z-index: 1;
+        }
+
+        .progress-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ffffff;
+            font-weight: bold;
+            z-index: 2;
+        }
+    </style>
+</head>
+<body>
+    <!-- 전역일 계산기 UI 구성 -->
+    <div class="calculators-container">
+        <div class="calculator-container">
+            <h2>전역일 계산기</h2>
+            <div class="input-container">
+                <label for="serviceStartDate">입대일:</label>
+                <input type="date" id="serviceStartDate" max="9999-12-31">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <input type="checkbox" id="todayCheckbox" onchange="setTodayAsStartDate()">
+                    <label for="todayCheckbox">오늘을 입대일로 설정</label>
+                </div>
+            </div>
+            <div class="input-container">
+                <label for="serviceType">복무형태:</label>
+                <select id="serviceType">
+                    <option value="army">육군</option>
+                    <option value="airforce">공군</option>
+                    <option value="navy">해군</option>
+                    <option value="marine">해병대</option>
+                    <option value="public">공익</option>
+                </select>
+            </div>
+            <button class="btn" onclick="calculateServiceEndDate()">전역일 계산하기</button>
+            <div class="result-container" id="serviceResult"></div>
+        </div>
+        <div class="calculator-container">
+            <h2>계급 달성 날짜</h2>
+            <div class="result-container" id="rankResult"></div>
+            <div class="rank-progress-container" id="rankProgressContainer">
+                <div class="progress-bar" id="progressBar"></div>
+                <div class="progress-label" id="progressLabel"></div>
+            </div>
+        </div>
+    </div>
+    <script>function calculateServiceEndDate() {
+            const startDate = document.getElementById("serviceStartDate").value;
+            const serviceType = document.getElementById("serviceType").value;
+
+            if (!startDate) {
+                alert("입대일을 입력해 주세요.");
+                return;
+            }
+
+            const start = new Date(startDate);
+            let serviceDays;
+            let rankSchedule = [];
+
+            switch (serviceType) {
+                case "army":
+                case "marine":
+                    serviceDays = 547; // 18 months
+                    rankSchedule = [
+                        { rank: "이병", days: 60 },
+                        { rank: "일병", days: 180 },
+                        { rank: "상병", days: 365 },
+                        { rank: "병장", days: 485 }
+                    ];
+                    break;
+                case "airforce":
+                    serviceDays = 640; // 21 months
+                    rankSchedule = [
+                        { rank: "이병", days: 60 },
+                        { rank: "일병", days: 180 },
+                        { rank: "상병", days: 400 },
+                        { rank: "병장", days: 570 }
+                    ];
+                    break;
+                case "navy":
+                    serviceDays = 730; // 24 months
+                    rankSchedule = [
+                        { rank: "이병", days: 60 },
+                        { rank: "일병", days: 180 },
+                        { rank: "상병", days: 455 },
+                        { rank: "병장", days: 640 }
+                    ];
+                    break;
+                case "public":
+                    serviceDays = 639; // 21 months
+                    rankSchedule = [
+                        { rank: "기초교육", days: 30 },
+                        { rank: "복무요원", days: 180 }
+                    ];
+                    break;
+                default:
+                    alert("잘못된 복무 형태입니다.");
+                    return;
+            }
+
+            const endDate = new Date(start);
+            endDate.setDate(endDate.getDate() + serviceDays);
+
+            const remainingDays = Math.max(serviceDays - Math.floor((new Date() - start) / (1000 * 60 * 60 * 24)), 0);
+
+            const resultContainer = document.getElementById("serviceResult");
+            resultContainer.innerHTML = `전역일은 ${endDate.getFullYear()}년 ${endDate.getMonth() + 1}월 ${endDate.getDate()}일 입니다.<br>남은 복무일: ${remainingDays}일`;
+
+            const rankResultContainer = document.getElementById("rankResult");
+            rankResultContainer.innerHTML = "";
+            rankSchedule.forEach(rank => {
+                const rankDate = new Date(start);
+                rankDate.setDate(rankDate.getDate() + rank.days);
+                rankResultContainer.innerHTML += `${rank.rank}: ${rankDate.getFullYear()}년 ${rankDate.getMonth() + 1}월 ${rankDate.getDate()}일<br>`;
+            });
+
+            updateRankProgress(serviceDays, start);
+        }
+
+        function updateRankProgress(totalDays, startDate) {
+            const today = new Date();
+            const elapsedDays = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
+            const progressPercentage = Math.min((elapsedDays / totalDays) * 100, 100);
+
+            const progressBar = document.getElementById("progressBar");
+            progressBar.style.width = `${progressPercentage}%`;
+
+            const progressLabel = document.getElementById("progressLabel");
+            progressLabel.textContent = `${elapsedDays}일 복무 (${Math.round(progressPercentage)}%)`;
+        }
+
+        function setTodayAsStartDate() {
+            const checkbox = document.getElementById("todayCheckbox");
+            const dateInput = document.getElementById("serviceStartDate");
+            if (checkbox.checked) {
+                const today = new Date();
+                const formattedDate = today.toISOString().split('T')[0];
+                dateInput.value = formattedDate;
+            } else {
+                dateInput.value = "";
+            }
+        }</script>
+</body>
+<!--
+전체적인 코드 설명:
+
+이 HTML 파일은 전역일을 계산하는 웹 애플리케이션을 구성합니다.
+사용자는 특정 시작 날짜(예: 군 복무 시작일)를 입력하면 전역 예정일과 계급 달성 날짜를 계산할 수 있습니다.
+
+1. <head> 섹션에서는 메타데이터와 스타일이 정의되어 있으며, 계산기 UI의 스타일을 설정하는 CSS 코드가 포함되어 있습니다.
+2. <body> 섹션에서는 전역일 계산기와 계급 달성 날짜 계산기가 구성됩니다.
+   - 전역일 계산기는 날짜 입력 필드, 복무 형태 선택 드롭다운, 그리고 결과를 보여주는 영역으로 구성되어 있습니다.
+   - 계급 달성 날짜는 이등병, 일병, 상병, 병장을 언제 달성하는지 표시합니다.
+   - 계급 그래프는 진행률을 시각적으로 보여줍니다.
+3. <script> 태그에서는 JavaScript로 각 기능을 구현합니다.
+
+이 구조를 통해 사용자는 브라우저에서 쉽게 전역일과 계급 달성 날짜를 계산할 수 있습니다.
+-->
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>그래프 계산기</title>
+    
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #F8E0DC;
+            flex-direction: column;
+        }
+        canvas {
+            border: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+    <!-- 계산기 버튼 -->
+    <button class="graphic-calculator-btn" onclick="location.href='index.html'" style="position: absolute; top: 10px; right: 10px;">
+        계산기
+    </button>
+    <input type="text" id="inputField" placeholder="수식을 입력하세요 (예: x*x - 4)" style="width: 300px; padding: 10px; font-size: 16px;"/>
+    <button id="drawButton" style="padding: 10px; font-size: 16px;">그래프 그리기</button>
+    <canvas id="coordinatePlane" width="600" height="400"></canvas>
+
+    <script src="graphjs.js"></script>
+</body>
+</html>

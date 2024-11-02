@@ -1,0 +1,67 @@
+body {
+    background-color: #F8E0DC; /* 배경색 */
+}
+.calculator-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.display-container {
+    background-color: #C4D1C5;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    text-align: center;
+    font-size: 2em;
+    width: 100%;
+    max-width: 600px; /* 최대 폭 제한 */
+}
+.calculator {
+    background-color: #C4D1C5;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 100%;
+    max-width: 600px; /* 최대 폭 제한 */
+}
+.buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+.btn {
+    padding: 20px;
+    font-size: 1.2em;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    background-color: #e0e0e0;
+    transition: background-color 0.2s;
+}
+.btn.operator, .btn.trig, .btn.hyperbolic, .btn.misc {
+    background-color: #C99DCA; /* 보라색 */
+    color: #ffffff; /* 흰색 글자 */
+}
+.btn:hover {
+    background-color: #807097; /* Slightly darker shade on hover */
+}
+.btn:active {
+    background-color: #ccc;
+}
+.canvas-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+}
+canvas {
+    border: 1px solid #000;
+    background-color: #ffffff;
+    width: 800px; /* 좌표 평면의 너비 */
+    height: 600px; /* 좌표 평면의 높이 */
+}
+#inputField {
+    width: 100%;
+    padding: 10px;
+    font-size: 1.5em;
+}
